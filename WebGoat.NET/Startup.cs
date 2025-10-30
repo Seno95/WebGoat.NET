@@ -126,18 +126,13 @@ namespace WebGoatCore
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler($"/{StatusCodeController.NAME}?code=500");
-            }
+           
 
             app.UseStatusCodePagesWithRedirects($"/{StatusCodeController.NAME}?code={{0}}");
 
             app.UseStaticFiles();
+
+            app.UseDeveloperExceptionPage();
 
             app.UseRouting();
 

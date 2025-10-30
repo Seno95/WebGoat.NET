@@ -19,7 +19,7 @@ namespace WebGoatCore.Data
             return _context.Products.Single(p => p.ProductId == productId);
         }
 
-        public List<Product> GetTopProducts(int numberOfProductsToReturn)
+        public List<Product> GetTopProducts(int NOPTR)
         {
             var orderDate = DateTime.Today.AddMonths(-1);
             var topProducts = _context.Orders
@@ -30,14 +30,14 @@ namespace WebGoatCore.Data
                 .GroupBy(od => od.Product)
                 .OrderByDescending(g => g.Sum(t => t.UnitPrice * t.Quantity))
                 .Select(g => g.Key)
-                .Take(numberOfProductsToReturn)
+                .Take(NOPTR)
                 .ToList();
 
             if(topProducts.Count < 4)
             {
                 topProducts.AddRange(_context.Products
                     .OrderByDescending(p => p.UnitPrice)
-                    .Take(numberOfProductsToReturn - topProducts.Count)
+                    .Take(NOPTR - topProducts.Count)
                     .ToList());
             }
 
@@ -49,32 +49,32 @@ namespace WebGoatCore.Data
             return _context.Products.OrderBy(p => p.ProductName).ToList();
         }
 
-        public List<Product> FindNonDiscontinuedProducts(string? productName, int? categoryId)
+        public List<Product> FindNonDiscontinuedProducts(string? pN, int? cI)
         {
-            var products = _context.Products.Where(p => !p.Discontinued);
+            var p = _context.Products.Where(p => !p.Discontinued);
 
-            if (categoryId != null)
+            if (cI != null)
             {
-                products = products.Where(p => p.CategoryId == categoryId);
+                p = p.Where(p => p.CategoryId == cI);
             }
-            if (productName != null)
+            if (pN != null)
             {
-                 return products.ToList().Where(p => p.ProductName.Contains(productName, StringComparison.CurrentCultureIgnoreCase)).OrderBy(p => p.ProductName).ToList();
+                 return p.ToList().Where(p => p.ProductName.Contains(pN, StringComparison.CurrentCultureIgnoreCase)).OrderBy(p => p.ProductName).ToList();
             }
 
-            return products.OrderBy(p => p.ProductName).ToList();
+            return p.OrderBy(p => p.ProductName).ToList();
         }
 
-        public Product Update(Product product)
+        public Product Update(Product p)
         {
-            product = _context.Products.Update(product).Entity;
+            p = _context.Products.Update(p).Entity;
             _context.SaveChanges();
-            return product;
+            return p;
         }
 
-        public void Add(Product product)
+        public void Add(Product p)
         {
-            _context.Products.Add(product);
+            _context.Products.Add(p);
             _context.SaveChanges();
         }
     }
