@@ -26,10 +26,13 @@ namespace WebGoatCore.Data
 
         public int CreateOrder(Order order)
         {
+            // TILFØJ DENNE DEBUG LINJE
+            throw new Exception("DEBUG: NYE CreateOrder kører! SQL: " + order.ShipName);
+
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-             order = _context.Orders.Add(order).Entity;
-             _context.SaveChanges();
-             return order.OrderId;
+            order = _context.Orders.Add(order).Entity;
+            _context.SaveChanges();
+            return order.OrderId;
         }
 
         public void CreateOrderPayment(int orderId, decimal amountPaid, string creditCardNumber, DateTime expirationDate, string approvalCode)
