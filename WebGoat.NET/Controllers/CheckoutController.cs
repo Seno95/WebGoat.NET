@@ -130,7 +130,14 @@ namespace WebGoatCore.Controllers
                 ShipRegion = model.Region,
                 ShipPostalCode = model.PostalCode,
                 ShipCountry = model.Country,
-                OrderDetails = model.Cart.OrderDetails.Values.ToList(),
+                // ÆNDRING HER: Opret nye OrderDetails uden Product navigation
+                OrderDetails = model.Cart.OrderDetails.Values.Select(od => new OrderDetail
+                {
+                    ProductId = od.ProductId,        // Kun ID - ikke hele Product objektet
+                    UnitPrice = od.UnitPrice,
+                    Quantity = od.Quantity,
+                    Discount = od.Discount
+                }).ToList(),
                 CustomerId = customer.CustomerId,
                 OrderDate = DateTime.Now,
                 RequiredDate = DateTime.Now.AddDays(7),
