@@ -26,9 +26,6 @@ namespace WebGoatCore.Data
 
         public int CreateOrder(Order order)
         {
-            // TILFØJ DENNE DEBUG LINJE
-            throw new Exception("DEBUG: NYE CreateOrder kører! SQL: " + order.ShipName);
-
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             order = _context.Orders.Add(order).Entity;
             _context.SaveChanges();
