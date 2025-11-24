@@ -3,6 +3,7 @@ using WebGoatCore.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace WebGoatCore.Controllers
 {
@@ -32,6 +33,25 @@ namespace WebGoatCore.Controllers
         [HttpPost("{entryId}")]
         public IActionResult Reply(int entryId, string contents)
         {
+            // INPUT VALIDERING
+            if (string.IsNullOrWhiteSpace(contents))
+            {
+                ModelState.AddModelError("contents", "Comment cannot be empty");
+                return View(_blogEntryRepository.GetBlogEntry(entryId));
+            }
+            
+            if (contents.Length > 1000)
+            {
+                ModelState.AddModelError("contents", "Comment must be less than 1000 characters");
+                return View(_blogEntryRepository.GetBlogEntry(entryId));
+            }
+
+            if (ContainsDangerousPatterns(contents))
+            {
+                ModelState.AddModelError("contents", "Comment contains invalid characters");
+                return View(_blogEntryRepository.GetBlogEntry(entryId));
+            }
+
             var userName = User?.Identity?.Name ?? "Anonymous";
             var response = new BlogResponse()
             {
@@ -45,14 +65,30 @@ namespace WebGoatCore.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public IActionResult Create() => View();
+        private bool ContainsDangerousPatterns(string input)
+        {
+            var dangerousPatterns = new[] { "<script", "javascript:", "onload=", "onerror=", "onclick=" };
+            return dangerousPatterns.Any(pattern => 
+                input.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+        }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public IActionResult Create(string title, string contents)
         {
+            // VALIDERING FOR BLOG INDLÆG
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(contents))
+            {
+                ModelState.AddModelError("", "Title and contents are required");
+                return View();
+            }
+            
+            if (contents.Length > 5000) 
+            {
+                ModelState.AddModelError("contents", "Content too long");
+                return View();
+            }
+
             var blogEntry = _blogEntryRepository.CreateBlogEntry(title, contents, User!.Identity!.Name!);
             return View(blogEntry);
         }
