@@ -6,6 +6,15 @@
 
 <partial name="_BlogEntryPartial" model=@Model/>
 <h1>Your response</h1>
+
+<!-- FEJLVISNING -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @Html.ValidationSummary()
+    </div>
+}
+
 <form method="post">
     <textarea name="contents" rows="2" cols="20" class="BlogEntryReplyText"></textarea>
     <br>
